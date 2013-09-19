@@ -69,6 +69,7 @@ function GlyphModel(font, data) {
   this.keywords = [this.originalName].concat(data.search || []).join(',');
 
   this.charRef = fixedFromCharCode(data.charRef);
+
   this.cssExt  = data['css-ext'];
   this.tooltip = "name: '" + this.originalName + "'" +
                  (data.search ? ',   tags: ' + data.search.join(', ') : '');

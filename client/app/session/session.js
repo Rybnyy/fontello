@@ -95,7 +95,26 @@ N.wire.on('session_save', _.debounce(function () {
   _.each(N.app.fontsList.fonts, function (font) {
     var font_data = { collapsed: font.collapsed(), glyphs: [] };
 
-    _.each(font.glyphs, function (glyph) {
+    // for custom icons we always have to store ALL
+    // glyphs + their state
+    if (font.isCustom) {
+      _.each(font.glyphs(), function (glyph) {
+        font_data.glyphs.push({
+          uid:      glyph.uid,
+          selected: glyph.selected(),
+          code:     glyph.code(),
+          css:      glyph.name(),
+          svg: {
+            path  : (glyph.svg || {}).path || '',
+            width : (glyph.svg || {}).width || 0
+          }
+        });
+      });
+      return;
+    }
+
+    // for regular fonts store state of modified glyphs only
+    _.each(font.glyphs(), function (glyph) {
       if (glyph.isModified()) {
         font_data.glyphs.push({
           uid:      glyph.uid,
@@ -179,19 +198,52 @@ N.wire.on('session_load', function () {
   _.each(session.fonts, function (sessionFont, name) {
     var targetFont = N.app.fontsList.fontsByName[name];
 
+    // Do nothing for unknown fonts
     if (!targetFont) { return; }
 
     targetFont.collapsed(!!sessionFont.collapsed);
 
+    //
+    // for custom icons - import glyphs & set their state
+    //
+    if (targetFont.fontname === 'custom_icons') {
+      var glyphs = [];
+      var charRefCode = 0xE800;
+
+      _.each(sessionFont.glyphs, function (glyph) {
+        // skip broken glyphs
+        if (!glyph.code || !glyph.css || !glyph.svg ||
+            (!glyph.svg || {}).path || (!glyph.svg || {}).width) {
+          return;
+        }
+
+        glyphs.push(new N.models.GlyphModel(targetFont, {
+          code:     glyph.css,
+          selected: glyph.selected,
+          name:     glyph.name,
+          uid:      glyph.uid,
+          charRef:  String.fromCharCode(charRefCode++),
+          path:     glyph.svg.path,
+          width:    glyph.svg.path
+        }));
+      });
+
+      targetFont.glyphs().concat(glyphs);
+      return;
+    }
+
+    //
+    // for existing fonts - set states only
+    //
+
     // create map to lookup glyphs by id
     var lookup = {};
-    _.each(targetFont.glyphs, function (glyph) {
+    _.each(targetFont.glyphs(), function (glyph) {
       lookup[glyph.uid] = glyph;
     });
 
     // fill glyphs state
     _.each(sessionFont.glyphs, function (glyph) {
-
       var targetGlyph = lookup[glyph.uid];
 
       // FIXME: temporary fix, when we got uid that does not exists
