@@ -6,6 +6,7 @@ var async = require('async');
 var fontface = require('../_fontface.js');
 
 function uid() {
+  /*jshint bitwise: false*/
   return 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'.replace(/[x]/g, function() {
     return ((Math.random()*16)|0).toString(16);
   });
