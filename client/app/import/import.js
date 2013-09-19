@@ -3,7 +3,6 @@
 
 var _     = require('lodash');
 var async = require('async');
-var fontface = require('../_lib/fontface.js');
 
 function uid() {
   /*jshint bitwise: false*/
@@ -129,28 +128,26 @@ function import_svg(data, file) {
   }
   var xmlDoc=loadXMLString(data);
   var svgGlyps = xmlDoc.getElementsByTagName('glyph');
-  console.log(svgGlyps);
 
+  var charRefCode = _.max(customFont.glyphs(), function(glyph) { return glyph.originalCode; }).originalCode;
+  charRefCode = (!charRefCode) || (charRefCode < 0xe800) ? 0xe800 : charRefCode;
+
+  var glyphs = [];
   _.each(svgGlyps, function (svgGlyph) {
-    var code = svgGlyph.attributes['unicode'].value.charCodeAt(0);
     var d = svgGlyph.attributes['d'].value;
 
     var glyphsData = {
       "css": (svgGlyph.attributes['glyph-name'].value || 'glyph'), // default name
-      "code": code,
+      "code": charRefCode,
       "uid": uid(),
-      "charRef": code,
+      "charRef": charRefCode++,
       "path": coordinateTransform(d),
       "width": svgGlyph.attributes['horiz-adv-x'].value
     };
-    var glyph = new N.models.GlyphModel(customFont, glyphsData);
-    customFont.glyphs.push(glyph);
+    glyphs.push(new N.models.GlyphModel(customFont, glyphsData));
   });
   
-  console.log(customFont);
-
-  var ff = fontface(customFont.makeSvgFont(), customFont.fontname);
-  N.app.updateFontStyle(ff, customFont.fontname);
+  customFont.glyphs(customFont.glyphs().concat(glyphs));
 }
 
 // Handles change event of file input

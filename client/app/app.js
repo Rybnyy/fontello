@@ -9,6 +9,7 @@ var ko = require('knockout');
 var embedded_fonts = require('../../lib/embedded_fonts/client_config');
 var codesTracker   = require('./_codes_tracker');
 var namesTracker   = require('./_names_tracker');
+var fontface = require('./_lib/fontface.js');
 
 var DEFAULT_GLYPH_SIZE = 16;
 
@@ -194,6 +195,30 @@ function FontModel(data) {
 
   this.collapsed = ko.observable(false);
 
+  // Array of font glyphs
+  //
+  this.glyphs = ko.observableArray(_.map(data.glyphs, function (data) {
+    return new GlyphModel(this, data);
+  }));
+
+  // Array of selected glyphs of a font
+  //
+  this.selectedGlyphs = ko.computed(function () {
+    return _.filter(this.glyphs(), function (glyph) { return glyph.selected(); });
+  }, this).extend({ throttle: 100 });
+
+  // selected glyphs count
+  //
+  this.selectedCount = ko.computed(function () {
+    return this.selectedGlyphs().length;
+  }, this);
+
+  // Visible glyphs count
+  //
+  this.visibleCount = ko.computed(function () {
+    return _.reduce(this.glyphs(), function (cnt, glyph) { return cnt + (glyph.visible() ? 1 : 0); }, 0);
+  }, this).extend({ throttle: 100 });
+
   //
   // Helpers
   //
@@ -275,29 +300,14 @@ function FontModel(data) {
     return svgFontTemplate(conf);
   };
 
-  // Array of font glyphs
+  // Subscribe to glyph updates
   //
-  this.glyphs = ko.observableArray(_.map(data.glyphs, function (data) {
-    return new GlyphModel(this, data);
-  }));
-
-  // Array of selected glyphs of a font
-  //
-  this.selectedGlyphs = ko.computed(function () {
-    return _.filter(this.glyphs(), function (glyph) { return glyph.selected(); });
-  }, this).extend({ throttle: 100 });
-
-  // selected glyphs count
-  //
-  this.selectedCount = ko.computed(function () {
-    return this.selectedGlyphs().length;
+  this.glyphs.subscribe(function () {
+    var ff = fontface(this.makeSvgFont(), this.fontname);
+    N.app.updateFontStyle(ff, this.fontname);
+    N.wire.emit('session_save');
   }, this);
 
-  // Visible glyphs count
-  //
-  this.visibleCount = ko.computed(function () {
-    return _.reduce(this.glyphs(), function (cnt, glyph) { return cnt + (glyph.visible() ? 1 : 0); }, 0);
-  }, this).extend({ throttle: 100 });
 }
 
 ////////////////////////////////////////////////////////////////////////////////
