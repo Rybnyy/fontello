@@ -246,6 +246,23 @@ function FontModel(data) {
     N.wire.emit('session_save');
   });
 
+  this.updateFontStyle = function (content, fontId) {
+    // + check for the style in the DOM and remove if contains
+    // + insert the new style into DOM
+
+    var cfg = {content : content, fontId : fontId};
+
+    var list =
+    '<style id="ff_${fontId}" type="text/css">\n ${content}' +
+    '  .font-${fontId} { font-family: "fml_customFont"; }\n' +
+    '</style>\n';
+
+    var style = _.template(list, cfg);
+
+    $('#ff_' + fontId).remove();
+    $(style).appendTo("head");
+  };
+
   this.makeSvgFont = function() {
     var conf             = {};
     conf.font            = {};
@@ -258,7 +275,7 @@ function FontModel(data) {
     conf.glyphs = _.map(this.glyphs(), function(glyph){
       return {
         css:    glyph.originalName,
-        code:   glyph.code(),
+        code:   glyph.charRef.charCodeAt(0),
         d:      glyph.svg.path,
         width:  glyph.svg.width
       };
@@ -304,7 +321,7 @@ function FontModel(data) {
   //
   this.glyphs.subscribe(function () {
     var ff = fontface(this.makeSvgFont(), this.fontname);
-    N.app.updateFontStyle(ff, this.fontname);
+    this.updateFontStyle(ff, this.fontname);
     N.wire.emit('session_save');
   }, this);
 
@@ -397,23 +414,6 @@ N.app.serverSave  = function(callback) {
   if (!N.app.apiSessionId) { return; }
 
   N.io.rpc('fontello.api.update', { sid: N.app.apiSessionId, config: N.app.getConfig() }, callback);
-};
-
-N.app.updateFontStyle = function (content, fontId) {
-  // + check for the style in the DOM and remove if contains
-  // + insert the new style into DOM
-
-  var cfg = {content : content, fontId : fontId};
-
-  var list =
-  '<style id="ff_${fontId}" type="text/css">\n ${content}' +
-  '  .font-${fontId} { font-family: "fml_customFont"; }\n' +
-  '</style>\n';
-
-  var style = _.template(list, cfg);
-
-  $('#ff_' + fontId).remove();
-  $(style).appendTo("head");
 };
 
 // Set new code for each selected glyph using currect encoding.

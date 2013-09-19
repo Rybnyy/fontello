@@ -129,8 +129,11 @@ function import_svg(data, file) {
   var xmlDoc=loadXMLString(data);
   var svgGlyps = xmlDoc.getElementsByTagName('glyph');
 
-  var charRefCode = _.max(customFont.glyphs(), function(glyph) { return glyph.originalCode; }).originalCode;
-  charRefCode = (!charRefCode) || (charRefCode < 0xe800) ? 0xe800 : charRefCode;
+  var charRefCode = _.max(customFont.glyphs(), function(glyph) {
+    return glyph.charRef.charCodeAt(0);
+  }).charRef;
+
+  charRefCode = (!charRefCode) ? 0xe800 : charRefCode.charCodeAt(0);
 
   var glyphs = [];
   _.each(svgGlyps, function (svgGlyph) {
@@ -138,7 +141,7 @@ function import_svg(data, file) {
 
     var glyphsData = {
       "css": (svgGlyph.attributes['glyph-name'].value || 'glyph'), // default name
-      "code": charRefCode,
+      "code": svgGlyph.attributes['unicode'].value.charCodeAt(0),
       "uid": uid(),
       "charRef": charRefCode++,
       "path": coordinateTransform(d),
@@ -146,7 +149,7 @@ function import_svg(data, file) {
     };
     glyphs.push(new N.models.GlyphModel(customFont, glyphsData));
   });
-  
+
   customFont.glyphs(customFont.glyphs().concat(glyphs));
 }
 
