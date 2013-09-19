@@ -80,7 +80,11 @@ function GlyphModel(font, data) {
   this.selected = ko.observable(false);
   this.name     = ko.observable(this.originalName);
   this.code     = ko.observable(this.originalCode);
-  this.svg  = {path: data.path, width: data.width};
+  
+  this.svg      = {
+    path:  data.path, 
+    width: data.width
+  };
 
   this.selected.subscribe(function () {
     N.wire.emit('session_save');
@@ -217,20 +221,20 @@ function FontModel(data) {
   });
 
   this.makeSvgFont = function() {
-    var conf = {};
-    conf.font = {};
-    conf.font.copyright = this.license;
-    conf.font.fontname = this.fontname;
+    var conf             = {};
+    conf.font            = {};
+    conf.font.copyright  = this.license;
+    conf.font.fontname   = this.fontname;
     conf.font.familyname = this.fontname;
-    conf.font.ascent = 850;
-    conf.font.descent = -150;
+    conf.font.ascent     = 850;
+    conf.font.descent    = -150;
     
-    conf.glyphs = _.map(this.glyphs(), function(gliph){
+    conf.glyphs = _.map(this.glyphs(), function(glyph){
       return {
-        css: gliph.originalName,
-        code: gliph.code(),
-        d: gliph.svg.path,
-        width:gliph.svg.width
+        css:    glyph.originalName,
+        code:   glyph.code(),
+        d:      glyph.svg.path,
+        width:  glyph.svg.width
       };
     });
 
@@ -354,12 +358,12 @@ N.app.cssUseSuffix  = ko.observable(false);
 N.app.hinting       = ko.observable(true);
 N.app.encoding      = ko.observable('pua');
 
-N.app.apiMode     = ko.observable(false);
-N.app.apiUrl      = ko.observable('');
+N.app.apiMode       = ko.observable(false);
+N.app.apiUrl        = ko.observable('');
 N.app.apiSessionId  = null;
 
 N.models = {};
-N.models.FontModel = FontModel;
+N.models.FontModel  = FontModel;
 N.models.GlyphModel = GlyphModel;
 
 
