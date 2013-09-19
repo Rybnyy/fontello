@@ -129,11 +129,11 @@ function import_svg(data, file) {
   var xmlDoc=loadXMLString(data);
   var svgGlyps = xmlDoc.getElementsByTagName('glyph');
 
-  var charRefCode = _.max(customFont.glyphs(), function(glyph) {
+  var maxRef = _.max(customFont.glyphs(), function(glyph) { // calculate charRef with max char code
     return glyph.charRef.charCodeAt(0);
   }).charRef;
 
-  charRefCode = (!charRefCode) ? 0xe800 : charRefCode.charCodeAt(0);
+  var charRefCode = (!maxRef) ? 0xe800 : maxRef.charCodeAt(0) + 1; // get next char code
 
   var glyphs = [];
   _.each(svgGlyps, function (svgGlyph) {
@@ -141,7 +141,7 @@ function import_svg(data, file) {
 
     var glyphsData = {
       "css": (svgGlyph.attributes['glyph-name'].value || 'glyph'), // default name
-      "code": svgGlyph.attributes['unicode'].value.charCodeAt(0),
+      "code": svgGlyph.attributes['unicode'].value.charCodeAt(0), // FIXME replace with fixedFromCharCode
       "uid": uid(),
       "charRef": charRefCode++,
       "path": coordinateTransform(d),

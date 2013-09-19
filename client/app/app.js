@@ -246,23 +246,6 @@ function FontModel(data) {
     N.wire.emit('session_save');
   });
 
-  this.updateFontStyle = function (content, fontId) {
-    // + check for the style in the DOM and remove if contains
-    // + insert the new style into DOM
-
-    var cfg = {content : content, fontId : fontId};
-
-    var list =
-    '<style id="ff_${fontId}" type="text/css">\n ${content}' +
-    '  .font-${fontId} { font-family: "fml_customFont"; }\n' +
-    '</style>\n';
-
-    var style = _.template(list, cfg);
-
-    $('#ff_' + fontId).remove();
-    $(style).appendTo("head");
-  };
-
   this.makeSvgFont = function() {
     var conf             = {};
     conf.font            = {};
@@ -320,9 +303,24 @@ function FontModel(data) {
   // Subscribe to glyph updates
   //
   this.glyphs.subscribe(function () {
-    var ff = fontface(this.makeSvgFont(), this.fontname);
-    this.updateFontStyle(ff, this.fontname);
+    if (!this.isCustom) { return; }
+
     N.wire.emit('session_save');
+
+    var ff = fontface(this.makeSvgFont(), this.fontname);
+
+    var styleTemplate =
+      '<style id="ff_${fontId}" type="text/css">\n ${fontface}' +
+      '  .font-${fontId} { font-family: "fml_customFont"; }\n' +
+      '</style>\n';
+
+    var style = _.template(styleTemplate, {
+      fontface : ff,
+      fontId : this.fontname
+    });
+
+    $('#ff_' + this.fontname).remove();
+    $(style).appendTo("head");
   }, this);
 
 }
