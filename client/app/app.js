@@ -301,11 +301,10 @@ function FontsList() {
   this.fonts = [];
 
   // Set the Custom font
-  var customIconsId = 'custom_icons';
   this.fonts.push(new FontModel({
     font: {
-      fontname: customIconsId,
-      fullname: t(customIconsId)
+      fontname: 'custom_icons',
+      fullname: t('custom_icons_name')
     },
     isCustom : true
   }));
