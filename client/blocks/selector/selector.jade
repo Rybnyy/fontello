@@ -1,12 +1,12 @@
 #selector.tab-pane.fade
   ul#selector-fonts.list-unstyled(data-bind="style: { 'fontSize': fontSize() + 'px' }, css: { 'search-mode': searchMode }")
-    h2.src-font-head Custom font
+    h2.src-font-head(data-bind='text: fontsList.fonts[0].fullname')
     // ko foreach: fontsList.fonts
     // ko if: isCustom
     li(data-bind='if: !visibleCount()')
        p Please drag a svg file here
     li(data-bind='if: visibleCount()')
-      ul.list-inline.font-glyphs.font-customFont(data-bind='foreach: glyphs')
+      ul.list-inline.font-glyphs.font-custom_icons(data-bind='foreach: glyphs')
         li.glyph(data-bind='visible: visible')
           input(type='checkbox', data-bind='checked: selected, attr: { id: uid }')
           //- class binding for the label - kludge for IE8, that sucks with input:checked

@@ -225,12 +225,12 @@ function FontModel(data) {
     conf.font.ascent = 850;
     conf.font.descent = -150;
     
-    conf.glyphs = _.map(this.glyphs(), function(data){
+    conf.glyphs = _.map(this.glyphs(), function(gliph){
       return {
-        css: data.originalName,
-        code: data.code(),
-        d: data.svg.path,
-        width:data.svg.width
+        css: gliph.originalName,
+        code: gliph.code(),
+        d: gliph.svg.path,
+        width:gliph.svg.width
       };
     });
 
@@ -301,7 +301,14 @@ function FontsList() {
   this.fonts = [];
 
   // Set the Custom font
-  this.fonts.push(new FontModel({font: {fontname: 'customFont'}, isCustom : true}));
+  var customIconsId = 'custom_icons';
+  this.fonts.push(new FontModel({
+    font: {
+      fontname: customIconsId,
+      fullname: t(customIconsId)
+    },
+    isCustom : true
+  }));
 
   // Ordered list, to display on the page
   this.fonts.push.apply(this.fonts, _.map(embedded_fonts, function (data) {
