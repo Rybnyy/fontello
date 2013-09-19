@@ -193,7 +193,6 @@ N.wire.on('session_load', function () {
   // not nesessary now, since we load session only on start
   //_.each(N.app.fontsList.selectedGlyphs(), function (glyph) { glyph.selected(false); });
 
-console.log(session.fonts);
   // load glyphs states
   _.each(session.fonts, function (sessionFont, name) {
     var targetFont = N.app.fontsList.getFont(name);

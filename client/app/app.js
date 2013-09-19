@@ -173,6 +173,8 @@ function GlyphModel(font, data) {
 
 ////////////////////////////////////////////////////////////////////////////////
 function FontModel(data) {
+  var self = this;
+
   //
   // Essential properties
   //
@@ -198,7 +200,7 @@ function FontModel(data) {
   // Array of font glyphs
   //
   this.glyphs = ko.observableArray(_.map(data.glyphs, function (data) {
-    return new GlyphModel(this, data);
+    return new GlyphModel(self, data);
   }));
 
   // Array of selected glyphs of a font
