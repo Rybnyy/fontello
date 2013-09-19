@@ -82,7 +82,7 @@ function GlyphModel(font, data) {
   this.code     = ko.observable(this.originalCode);
   
   this.svg      = {
-    path:  data.path, 
+    path:  data.path,
     width: data.width
   };
 
