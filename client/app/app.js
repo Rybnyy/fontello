@@ -344,10 +344,6 @@ function FontsList() {
     return new FontModel(data);
   }));
 
-  // Named list, for state import/export
-  this.fontsByName = {};
-  _.each(this.fonts, function (font) { this.fontsByName[font.fontname] = font; }, this);
-
   // Array of selected glyphs from all fonts
   //
   this.selectedGlyphs = ko.computed(function () {
@@ -367,6 +363,12 @@ function FontsList() {
   this.visibleCount = ko.computed(function () {
     return _.reduce(this.fonts, function (cnt, font) { return cnt + (font.visibleCount() ? 1 : 0); }, 0);
   }, this).extend({ throttle: 100 });
+
+  // Search font by name
+  //
+  this.getFont = function(name) {
+    return _.find(this.fonts, function(font) { return font.fontname === name; });
+  };
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -519,5 +521,9 @@ N.wire.once('navigate.done', function () {
   N.wire.on('cmd:set_encoding_unicode', function () {
     N.app.encoding('unicode');
     updateGlyphCodes();
+  });
+
+  N.wire.on('cmd:clear_custom_icons', function () {
+    N.app.fontsList.getFont('custom_icons').glyphs([]);
   });
 });

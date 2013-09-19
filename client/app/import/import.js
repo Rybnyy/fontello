@@ -23,7 +23,7 @@ function import_config(str, file) {
 
   try {
     var config  = JSON.parse(str);
-    var fontsByName = N.app.fontsList.fontsByName;
+    var getFont = _.memoize(N.app.fontsList.getFont);
 
     N.app.fontName(config.name || '');
     N.app.cssPrefixText(String(config.css_prefix_text || 'icon-'));
@@ -43,7 +43,7 @@ function import_config(str, file) {
 
     _.each(config.glyphs, function (g) {
 
-      if (!_.has(fontsByName, g.src)) { return; }
+      if (!getFont(g.src)) { return; }
 
       var glyph = glyphById[g.uid];
 
@@ -140,12 +140,12 @@ function import_svg(data, file) {
     var d = svgGlyph.attributes['d'].value;
 
     var glyphsData = {
-      "css": (svgGlyph.attributes['glyph-name'].value || 'glyph'), // default name
-      "code": svgGlyph.attributes['unicode'].value.charCodeAt(0), // FIXME replace with fixedFromCharCode
-      "uid": uid(),
-      "charRef": charRefCode++,
-      "path": coordinateTransform(d),
-      "width": svgGlyph.attributes['horiz-adv-x'].value
+      css:    (svgGlyph.attributes['glyph-name'].value || 'glyph'), // default name
+      code:   svgGlyph.attributes['unicode'].value.charCodeAt(0), // FIXME replace with fixedFromCharCode
+      uid:    uid(),
+      charRef:  charRefCode++,
+      path:   coordinateTransform(d),
+      width:  svgGlyph.attributes['horiz-adv-x'].value
     };
     glyphs.push(new N.models.GlyphModel(customFont, glyphsData));
   });

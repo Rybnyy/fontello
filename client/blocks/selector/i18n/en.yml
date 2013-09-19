@@ -2,4 +2,5 @@ en-US:
   author: by
   license: "license:"
   notfound: Oops! Nothing found...
-  emptycustomfont: Please drag a svg font file here
+  custom_icons_help: Here you can drag custom SVG icons or SVG font
+  clear_icons: clear

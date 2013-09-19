@@ -9,7 +9,10 @@
           small
             span.search-cnt.icon-search(data-bind='text: visibleCount()')
             span.selected-cnt(data-bind='visible: selectedCount, text: selectedCount')
-        a.src-font-name._collapser(href="#", data-bind='text: fullname, click: toggleCollapsed')
+        a.src-font-name._collapser(href='#', data-bind='text: fullname, click: toggleCollapsed')
+
+        small.font-details(data-bind='visible: visibleCount()')
+          a.selector__font-control(href='#', data-on-click='cmd:clear_custom_icons')= self.t('clear_icons')
 
       // ko if: visibleCount()
       ul.list-inline.font-glyphs.font-custom_icons(data-bind='foreach: glyphs')
@@ -21,7 +24,7 @@
       // /ko
 
       // ko ifnot: visibleCount()
-      li= self.t('emptycustomfont')
+      li= self.t('custom_icons_help')
       // /ko
     // /ko
 
@@ -33,7 +36,7 @@
             span.search-cnt.icon-search(data-bind='text: visibleCount()')
             span.selected-cnt(data-bind='visible: selectedCount, text: selectedCount')
 
-        a.src-font-name._collapser(href="#", data-bind='text: fullname, click: toggleCollapsed')
+        a.src-font-name._collapser(href='#', data-bind='text: fullname, click: toggleCollapsed')
 
         small.font-details(data-bind='visible: author')= self.t('author')
           |  
