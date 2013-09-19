@@ -135,22 +135,25 @@ function import_svg(data, file) {
 
   var charRefCode = (!maxRef) ? 0xe800 : maxRef.charCodeAt(0) + 1; // get next char code
 
-  var glyphs = [];
+  customFont.glyphs.valueWillMutate();
+
   _.each(svgGlyps, function (svgGlyph) {
     var d = svgGlyph.attributes['d'].value;
 
-    var glyphsData = {
-      css:    (svgGlyph.attributes['glyph-name'].value || 'glyph'), // default name
-      code:   svgGlyph.attributes['unicode'].value.charCodeAt(0), // FIXME replace with fixedFromCharCode
-      uid:    uid(),
-      charRef:  charRefCode++,
-      path:   coordinateTransform(d),
-      width:  svgGlyph.attributes['horiz-adv-x'].value
-    };
-    glyphs.push(new N.models.GlyphModel(customFont, glyphsData));
+    customFont.glyphs.peek().push(
+      new N.models.GlyphModel(customFont, {
+        css:    (svgGlyph.attributes['glyph-name'].value || 'glyph'), // default name
+        // FIXME replace with fixedFromCharCode
+        code:   svgGlyph.attributes['unicode'].value.charCodeAt(0),
+        uid:    uid(),
+        charRef:  charRefCode++,
+        path:   coordinateTransform(d),
+        width:  svgGlyph.attributes['horiz-adv-x'].value
+      })
+    );
   });
 
-  customFont.glyphs(customFont.glyphs().concat(glyphs));
+  customFont.glyphs.valueHasMutated();
 }
 
 // Handles change event of file input
