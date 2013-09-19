@@ -1,7 +1,7 @@
 'use strict';
 var _  = require('lodash');
 
-exports.getff = function(svg, fontId) {
+module.exports = function(svg, fontId) {
   // + make dataUri
   // + create style description string
 

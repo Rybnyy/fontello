@@ -3,7 +3,7 @@
 
 var _     = require('lodash');
 var async = require('async');
-var fontface = require('../_fontface.js');
+var fontface = require('../_lib/fontface.js');
 
 function uid() {
   /*jshint bitwise: false*/
@@ -149,7 +149,7 @@ function import_svg(data, file) {
   
   console.log(customFont);
 
-  var ff = fontface.getff(customFont.makeSvgFont(), customFont.fontname);
+  var ff = fontface(customFont.makeSvgFont(), customFont.fontname);
   N.app.updateFontStyle(ff, customFont.fontname);
 }
 
